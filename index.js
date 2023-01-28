@@ -48,9 +48,9 @@ function frameMsg(data) {
   const end = path.length - 1;
 
   let l = new Set(line1.concat(line2, line3, line4));
-  console.log("l", l);
+
   let line = Array.from(l);
-  console.log("line", line);
+
   let st = [];
   let indexes = [];
   let a = 0;
@@ -96,8 +96,6 @@ bot.command("start", (ctx) => {
     const text = ctx.update.message.text;
     const txtArr = text.split("to");
 
-    console.log(text);
-    console.log(txtArr);
     if (
       typeof Number(txtArr[0]) == "number" &&
       typeof Number(txtArr[1]) == "number"
@@ -120,7 +118,6 @@ bot.command("start", (ctx) => {
           ctx.reply(`${from} se ${to} jana hai! toh yeh karo`);
           getResponse(from, to)
             .then((data) => {
-              console.log(">>>>> then", data);
               ctx.reply(frameMsg(data));
             })
             .catch((err) => {
@@ -147,7 +144,6 @@ bot.command("start", (ctx) => {
       ctx.reply(`${ctx.update.message.text} jana hai! toh yeh karo`);
       getResponse(from, to)
         .then((data) => {
-          console.log(">>>>> then", data);
           ctx.reply(frameMsg(data));
         })
         .catch((err) => {
