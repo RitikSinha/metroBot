@@ -116,7 +116,10 @@ bot.command("start", (ctx) => {
           userId: ctx.from.id,
         };
         const newMsg = new Msg(msg);
-        newMsg.save().then((d) => console.log("msg saved", d));
+        newMsg
+          .save()
+          .then((d) => console.log("msg saved", d))
+          .catch((err) => console.log(err));
         let from = stations[Number(txtArr[0]) - 1];
         let to = stations[Number(txtArr[1]) - 1];
         if (from && to) {
