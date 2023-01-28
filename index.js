@@ -80,12 +80,17 @@ bot.command("start", (ctx) => {
     fullName: ctx.from?.first_name + " " + ctx.from?.last_name,
     userId: ctx.from.id,
   };
-  User.findOneAndUpdate({ userId: user.userId }, user).then((d) => {
-    if (!d) {
-      let newUser = new User(user);
-      newUser.save().then((d) => console.log("new user created", d));
-    }
-  });
+  User.findOneAndUpdate({ userId: user.userId }, user)
+    .then((d) => {
+      if (!d) {
+        let newUser = new User(user);
+        newUser
+          .save()
+          .then((d) => console.log("new user created", d))
+          .catch((err) => console.log(err));
+      }
+    })
+    .catch((err) => console.log(err));
   bot.telegram.sendMessage(
     ctx.chat.id,
     `Yo ${ctx.chat.first_name}! kaha jana ka irada  hai? 🙃 muhje batao.. eg. Dwarka to Sarai\n\n help: /help\n stations: /all`,
