@@ -138,8 +138,8 @@ bot.command("start", (ctx) => {
           `Yo ${ctx.chat.first_name}! /start /help /all /contact`,
           {}
         );
-        let from = findStations(txtArr[0]?.trim() + "\r");
-        let to = findStations(txtArr[1]?.trim() + "\r");
+        let from = findStations(txtArr[0]?.trim());
+        let to = findStations(txtArr[1]?.trim());
         console.log("stations:", txtArr[0]?.trim(), txtArr[1]?.trim());
         console.log(from, to);
         if (from && to) {
