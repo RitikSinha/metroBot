@@ -138,30 +138,30 @@ bot.command("start", (ctx) => {
           `Yo ${ctx.chat.first_name}! /start /help /all /contact`,
           {}
         );
+        let from = findStations(txtArr[0]?.trim() + "\r");
+        let to = findStations(txtArr[1]?.trim() + "\r");
+        if (from && to) {
+          let msg = {
+            text,
+            userId: ctx.from.id,
+          };
+          const newMsg = new Msg(msg);
+          newMsg
+            .save()
+            .then((d) => console.log("msg saved", d))
+            .catch((err) => console.log(err));
+          ctx.reply(`${ctx.update.message.text} jana hai! toh yeh karo`);
+          getResponse(from, to)
+            .then((data) => {
+              ctx.reply(frameMsg(data));
+            })
+            .catch((err) => {
+              console.log(">>>>>", err);
+            });
+        } else {
+          ctx.reply(`wait..`);
+        }
       }
-    }
-    let from = findStations(txtArr[0]?.trim() + "\r");
-    let to = findStations(txtArr[1]?.trim() + "\r");
-    if (from && to) {
-      let msg = {
-        text,
-        userId: ctx.from.id,
-      };
-      const newMsg = new Msg(msg);
-      newMsg
-        .save()
-        .then((d) => console.log("msg saved", d))
-        .catch((err) => console.log(err));
-      ctx.reply(`${ctx.update.message.text} jana hai! toh yeh karo`);
-      getResponse(from, to)
-        .then((data) => {
-          ctx.reply(frameMsg(data));
-        })
-        .catch((err) => {
-          console.log(">>>>>", err);
-        });
-    } else {
-      ctx.reply(`wait..`);
     }
   });
 });
