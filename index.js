@@ -140,6 +140,7 @@ bot.command("start", (ctx) => {
         );
         let from = findStations(txtArr[0]?.trim() + "\r");
         let to = findStations(txtArr[1]?.trim() + "\r");
+        console.log("stations:", txtArr[0]?.trim(), txtArr[1]?.trim());
         console.log(from, to);
         if (from && to) {
           let msg = {
