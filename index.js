@@ -6,6 +6,7 @@ const stations = stationsTxt.split("\n");
 
 const { Telegraf } = require("telegraf");
 const axios = require("axios");
+
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
 const metro = [];
@@ -36,7 +37,7 @@ function frameMsg(data) {
     time,
   } = data;
   const end = path.length - 1;
-  //   let st = path.join(" \n");
+
   let l = new Set(line1.concat(line2, line3, line4));
   console.log("l", l);
   let line = Array.from(l);
@@ -61,14 +62,14 @@ function frameMsg(data) {
 
   const res = `${path[0]} ➡️ ${path[end]}\n\nTime:⏳${time.toFixed(
     2
-  )} minutes\n\nStations:\n${renderTxt} 🏁`;
+  )} minutes\n\nStations:\n${renderTxt} 🏁\n\n Travel Safe!\n\n /start /all /contact`;
   return res;
 }
 bot.command("start", (ctx) => {
   console.log(ctx.from);
   bot.telegram.sendMessage(
     ctx.chat.id,
-    `Yo ${ctx.chat.first_name}! kaha jana ka irada  hai? 🙃 muhje batao.. eg. Dwarka to Sarai`,
+    `Yo ${ctx.chat.first_name}! kaha jana ka irada  hai? 🙃 muhje batao.. eg. Dwarka to Sarai\n\n help: /help\n stations: /all`,
     {}
   );
   // check for the message
@@ -77,13 +78,41 @@ bot.command("start", (ctx) => {
     const txtArr = text.split("to");
     console.log(text);
     console.log(txtArr);
-    let from = findStations(txtArr[0].trim() + "\r");
-    let to = findStations(txtArr[1].trim() + "\r");
+    if (
+      typeof Number(txtArr[0]) == "number" &&
+      typeof Number(txtArr[1]) == "number"
+    ) {
+      if (
+        Number(txtArr[0]) >= 1 &&
+        Number(txtArr[0]) <= 260 &&
+        Number(txtArr[1]) >= 1 &&
+        Number(txtArr[1]) <= 260
+      ) {
+        let from = stations[Number(txtArr[0]) - 1];
+        let to = stations[Number(txtArr[1]) - 1];
+        if (from && to) {
+          ctx.reply(`${from} se ${to} jana hai! toh yeh karo`);
+          getResponse(from, to)
+            .then((data) => {
+              console.log(">>>>> then", data);
+              ctx.reply(frameMsg(data));
+            })
+            .catch((err) => {
+              console.log(">>>>>", err);
+            });
+        }
+      } else {
+        bot.telegram.sendMessage(
+          ctx.chat.id,
+          `Yo ${ctx.chat.first_name}! /start /help /all /contact`,
+          {}
+        );
+      }
+    }
+    let from = findStations(txtArr[0]?.trim() + "\r");
+    let to = findStations(txtArr[1]?.trim() + "\r");
     if (from && to) {
-      metro.push(txtArr[0]);
-      metro.push(txtArr[1]);
       ctx.reply(`${ctx.update.message.text} jana hai! toh yeh karo`);
-
       getResponse(from, to)
         .then((data) => {
           console.log(">>>>> then", data);
@@ -93,26 +122,44 @@ bot.command("start", (ctx) => {
           console.log(">>>>>", err);
         });
     } else {
-      ctx.reply(`metro station pucha tha!`);
+      ctx.reply(`wait..`);
     }
   });
+});
+let stcodes = [];
+for (let i = 1; i <= stations.length; i++) {
+  stcodes.push(`${i} ${stations[i - 1]}`);
+}
+let len = stcodes.length;
+let codes1 = stcodes.slice(0, len / 2);
+let codes2 = stcodes.slice(len / 2, len);
+
+bot.command("/all", (ctx) => {
+  bot.telegram.sendMessage(
+    ctx.chat.id,
+    `All Stations with the given code\n ${codes1.join(" \n")}`,
+    {}
+  );
+  bot.telegram.sendMessage(ctx.chat.id, `\n ${codes2.join(" \n")}`, {});
+});
+
+bot.command("/help", (ctx) => {
+  bot.telegram.sendMessage(
+    ctx.chat.id,
+    `🚆Welcome to Delhi Metro Bot\n\n Aree ✌️ Isse use karna bhaut aasan hai!\n\n 1. Message karo \/start\n 2. fir yah toh stations bata do\neg. Dwarka to Sarai (yaad rakhna "to" likhna jaruri hai )\n\n nahi toh station code bhi likh sakte ho.\n\n station code dekhne ke liye "\/all" message karna\n firr eg. 23 to 70\n\n\n\n Baki agar koi bug report karna ho ya mujhe se kuch kaam ho toh "\/contact" message karna!`,
+    {}
+  );
+});
+
+bot.command("/contact", (ctx) => {
+  bot.telegram.sendMessage(
+    ctx.chat.id,
+    `Made with ❤️ by Ritik Sinha\n\n email: ritik@konfav.com linkedin: https://www.linkedin.com/in/ritikkumarsinha/`,
+    {}
+  );
 });
 
 // Enable graceful stop
 bot.launch();
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
-// if (findStations(ctx.update.message.text + "\r")) {
-//     metro.push(ctx.update.message.text);
-//     ctx.reply(`${metro[0]} se ${metro[1]} jane ke liye na yeh karo`);
-//   }
-
-// for (let i = 0; i < path.length; i++) {
-//     for (let j = 0; j < interchange.length; j++) {
-//       if (path[i] == interchange[j]) {
-//         console.log("a", a, "i", i);
-//         let arr = path.slice(a, i);
-//         st.push(arr);
-//         a = i;
-//       }
-//     }}
