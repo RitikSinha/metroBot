@@ -148,7 +148,10 @@ bot.command("start", (ctx) => {
         userId: ctx.from.id,
       };
       const newMsg = new Msg(msg);
-      newMsg.save().then((d) => console.log("msg saved", d));
+      newMsg
+        .save()
+        .then((d) => console.log("msg saved", d))
+        .catch((err) => console.log(err));
       ctx.reply(`${ctx.update.message.text} jana hai! toh yeh karo`);
       getResponse(from, to)
         .then((data) => {
