@@ -6,10 +6,19 @@ const stations = stationsTxt.split("\n");
 
 const { Telegraf } = require("telegraf");
 const axios = require("axios");
-
+const mongoose = require("mongoose");
+const User = require("./user");
+const Msg = require("./msg");
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
-const metro = [];
+//db connection
+mongoose.connect(
+  process.env.MONGO_URL,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  () => {
+    console.log("Connected to MongoDB");
+  }
+);
 const getResponse = async (from, to) => {
   const res = await axios.get(
     `https://us-central1-delhimetroapi.cloudfunctions.net/route-get?from=${from}&to=${to}`
@@ -67,6 +76,16 @@ function frameMsg(data) {
 }
 bot.command("start", (ctx) => {
   console.log(ctx.from);
+  const user = {
+    fullName: ctx.from?.first_name + " " + ctx.from?.last_name,
+    userId: ctx.from.id,
+  };
+  User.findOneAndUpdate({ userId: user.userId }, user).then((d) => {
+    if (!d) {
+      let newUser = new User(user);
+      newUser.save().then((d) => console.log("new user created", d));
+    }
+  });
   bot.telegram.sendMessage(
     ctx.chat.id,
     `Yo ${ctx.chat.first_name}! kaha jana ka irada  hai? 🙃 muhje batao.. eg. Dwarka to Sarai\n\n help: /help\n stations: /all`,
@@ -76,6 +95,7 @@ bot.command("start", (ctx) => {
   bot.on("message", (ctx) => {
     const text = ctx.update.message.text;
     const txtArr = text.split("to");
+
     console.log(text);
     console.log(txtArr);
     if (
@@ -88,6 +108,12 @@ bot.command("start", (ctx) => {
         Number(txtArr[1]) >= 1 &&
         Number(txtArr[1]) <= 260
       ) {
+        let msg = {
+          text,
+          userId: ctx.from.id,
+        };
+        const newMsg = new Msg(msg);
+        newMsg.save().then((d) => console.log("msg saved", d));
         let from = stations[Number(txtArr[0]) - 1];
         let to = stations[Number(txtArr[1]) - 1];
         if (from && to) {
@@ -112,6 +138,12 @@ bot.command("start", (ctx) => {
     let from = findStations(txtArr[0]?.trim() + "\r");
     let to = findStations(txtArr[1]?.trim() + "\r");
     if (from && to) {
+      let msg = {
+        text,
+        userId: ctx.from.id,
+      };
+      const newMsg = new Msg(msg);
+      newMsg.save().then((d) => console.log("msg saved", d));
       ctx.reply(`${ctx.update.message.text} jana hai! toh yeh karo`);
       getResponse(from, to)
         .then((data) => {
