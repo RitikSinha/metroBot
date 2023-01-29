@@ -46,7 +46,7 @@ function frameMsg(data) {
     path,
     time,
   } = data;
-  const end = path.length - 1;
+  const end = path?.length - 1;
 
   let l = new Set(line1.concat(line2, line3, line4));
 
@@ -127,6 +127,7 @@ bot.command("start", (ctx) => {
           ctx.reply(`${from} se ${to} jana hai! toh yeh karo`);
           getResponse(from, to)
             .then((data) => {
+              console.log(data);
               ctx.reply(frameMsg(data));
             })
             .catch((err) => {
