@@ -3,9 +3,11 @@ require("dotenv").config();
 const fs = require("fs");
 const stationsTxt = fs.readFileSync("./stations.txt", "utf-8");
 const s = stationsTxt.split("\n");
+const stationObJ = {};
 const stations = [];
 for (let st of s) {
   let word = st.substring(0, st.length - 1);
+  stationObJ[word.toLowerCase()] = word;
   stations.push(word);
 }
 
@@ -30,15 +32,7 @@ const getResponse = async (from, to) => {
   );
   return res.data;
 };
-// getResponse().then((d) => console.log(d));
-const findStations = async (str) => {
-  const found = await stations.find(
-    (ele) => ele.toLowerCase() === str.toLowerCase()
-  );
-  return found;
-};
-let num = 12.23232;
-num.toFixed();
+
 //frame good msg with data
 function frameMsg(data) {
   const {
@@ -145,8 +139,8 @@ bot.command("start", (ctx) => {
           `Yo ${ctx.chat.first_name}! /start /help /all /contact`,
           {}
         );
-        let from = await findStations(txtArr[0]?.trim());
-        let to = await findStations(txtArr[1]?.trim());
+        let from = stationObJ[txtArr[0]?.toLowerCase().trim()];
+        let to = stationObJ[txtArr[1]?.toLowerCase().trim()];
         console.log("stations:", txtArr[0]?.trim(), txtArr[1]?.trim());
         console.log(from, to);
         if (from && to) {

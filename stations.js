@@ -1,1 +1,1 @@
-
+console.log(stationObJ["welcome"]);
