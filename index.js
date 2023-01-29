@@ -2,7 +2,12 @@ require("dotenv").config();
 //loading stations
 const fs = require("fs");
 const stationsTxt = fs.readFileSync("./stations.txt", "utf-8");
-const stations = stationsTxt.split("\n");
+const s = stationsTxt.split("\n");
+const stations = [];
+for (let st of s) {
+  let word = st.substring(0, st.length - 1);
+  stations.push(word);
+}
 
 const { Telegraf } = require("telegraf");
 const axios = require("axios");
@@ -187,7 +192,7 @@ bot.command("/all", (ctx) => {
 bot.command("/help", (ctx) => {
   bot.telegram.sendMessage(
     ctx.chat.id,
-    `🚆Welcome to Delhi Metro Bot\n\n Aree ✌️ Isse use karna bhaut aasan hai!\n\n 1. Message karo \/start\n 2. fir yah toh stations bata do\neg. Dwarka to Sarai (yaad rakhna "to" likhna jaruri hai )\n\n nahi toh station code bhi likh sakte ho.\n\n station code dekhne ke liye "\/all" message karna\n firr eg. 23 to 70\n\n\n\n Baki agar koi bug report karna ho ya mujhe se kuch kaam ho toh "\/contact" message karna!`,
+    `🚆Welcome to Delhi Metro Bot\n\n Aree ✌️ Isse use karna bhaut aasan hai!\n\n 1. Message karo \/start\n 2. fir yah toh stations bata do\neg. Dwarka to Sarai (yaad rakhna "to" likhna jaruri hai )\n\n nahi toh station code bhi likh sakte ho.\n\n station code dekhne ke liye "\/all" message karna\n firr eg. 23 to 70\n\n\n\n Baki agar koi bug report karna ho ya mujhse kuch kaam ho toh "\/contact" message karna!`,
     {}
   );
 });
