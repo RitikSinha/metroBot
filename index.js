@@ -31,8 +31,10 @@ const getResponse = async (from, to) => {
   return res.data;
 };
 // getResponse().then((d) => console.log(d));
-const findStations = (str) => {
-  const found = stations.find((ele) => ele.toLowerCase() === str.toLowerCase());
+const findStations = async (str) => {
+  const found = await stations.find(
+    (ele) => ele.toLowerCase() === str.toLowerCase()
+  );
   return found;
 };
 let num = 12.23232;
@@ -102,7 +104,7 @@ bot.command("start", (ctx) => {
     {}
   );
   // check for the message
-  bot.on("message", (ctx) => {
+  bot.on("message", async (ctx) => {
     const text = ctx.update.message.text;
     const txtArr = text.split("to");
 
@@ -143,8 +145,8 @@ bot.command("start", (ctx) => {
           `Yo ${ctx.chat.first_name}! /start /help /all /contact`,
           {}
         );
-        let from = findStations(txtArr[0]?.trim());
-        let to = findStations(txtArr[1]?.trim());
+        let from = await findStations(txtArr[0]?.trim());
+        let to = await findStations(txtArr[1]?.trim());
         console.log("stations:", txtArr[0]?.trim(), txtArr[1]?.trim());
         console.log(from, to);
         if (from && to) {
